@@ -6,10 +6,10 @@ from sqlalchemy.sql.sqltypes import TIMESTAMP
 class User(db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
-    apps = db.relationship('App', backref='user', lazy='dynamic')
 
 class App(db.Model):
     __tablename__ = 'apps'
+    id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(20))
 
 class User2App(db.Model):
@@ -32,4 +32,4 @@ class Coor(db.Model):
     x = db.Column(db.Integer)
     y = db.Column(db.Integer)
     statu = db.Column(db.Integer)
-    time = db.Column(TIMESTAMP)
+    time = db.Column(db.String(30))
