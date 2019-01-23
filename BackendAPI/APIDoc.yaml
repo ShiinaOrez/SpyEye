@@ -1,0 +1,63 @@
+swagger: '2.0'
+
+info:
+  description: For Spy Eye in CCNU
+  version: 0.0.1
+  title: Test API
+  contact:
+    email: shiinaorez@gmail.com
+
+host: 119.23.79.87:5555
+basePath: /api/test
+schemes:
+  - http
+
+tags:
+  - name: test
+    description: POST DATA
+
+paths:
+  /post/:
+    post:
+      tags:
+        - test
+      summary: API for post data
+      description: Check and save data
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: POSTdata
+          in: body
+          description: An Operation
+          schema:
+            required:
+              - userID
+              - appName
+              - dataList
+            properties:
+              userID:
+                type: integer
+              appName:
+                type: string
+              dataList:
+                type: array
+                items:
+                  required:
+                    - x
+                    - y
+                    - statu
+                    - time
+                  properties:
+                    x:
+                      type: integer
+                    y:
+                      type: integer
+                    statu:
+                      type: integer
+                    time:
+                      type: string
+      response:
+        200:
+          description: OK
