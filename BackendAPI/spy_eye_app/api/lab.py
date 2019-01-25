@@ -12,7 +12,7 @@ def change(x):
 def post_data():
     uid = request.get_json().get('userID')
     appName = request.get_json().get('appName')
-    dataList = request.get_json().get('dataList')
+    List = request.get_json().get('List')
 
     usr = User.query.filter_by(id=uid).first()
     if usr is None:
@@ -29,10 +29,14 @@ def post_data():
         record = User2App(app_id=app.id, user_id=uid)
         change(record)
 
-    oper = Oper()
-    change(oper)
-    oper.record_id = record.id
-    for data in dataList:
-        coordinates = Coor(oper_id=oper.id, x=data["x"], y=data["y"], statu=data["statu"], time=data["time"])
-        change(coordinates)
-    return jsonify({"operationID": oper.id})
+    operationList = list()
+
+    for dataList in List:
+        oper = Oper()
+        change(oper)
+        oper.record_id = record.id
+        for data in dataList:
+            coordinates = Coor(oper_id=oper.id, x=data["x"], y=data["y"], statu=data["statu"], time=data["time"])
+            change(coordinates)
+        operationList.append(oper.id)
+    return jsonify({"operationIDList": operationList})

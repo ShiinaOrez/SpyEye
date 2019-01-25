@@ -35,7 +35,7 @@ paths:
             required:
               - userID
               - appName
-              - dataList
+              - List
             properties:
               userID:
                 type: integer
@@ -45,19 +45,37 @@ paths:
                 type: array
                 items:
                   required:
-                    - x
-                    - y
-                    - statu
-                    - time
+                    - dataList
                   properties:
-                    x:
-                      type: integer
-                    y:
-                      type: integer
-                    statu:
-                      type: integer
-                    time:
-                      type: string
+                    dataList:
+                      type: array
+                      items:
+                        required:
+                          - x
+                          - y
+                          - statu
+                          - time
+                        properties:
+                          x:
+                            type: integer
+                          y:
+                            type: integer
+                          statu:
+                            type: integer
+                          time:
+                            type: string
       response:
         200:
           description: OK
+          schema:
+            required:
+              - operationIDList
+            property:
+              operationIDList:
+                 type: array
+                 item:
+                   required:
+                     - ID
+                    properties:
+                      ID:
+                        type: integer
