@@ -1,81 +1,81 @@
 swagger: '2.0'
 
 info:
-  description: For Spy Eye in CCNU
-  version: 0.0.1
-  title: Test API
-  contact:
-    email: shiinaorez@gmail.com
+description: For Spy Eye in CCNU
+version: 0.0.1
+title: Test API
+contact:
+  email: shiinaorez@gmail.com
 
 host: 119.23.79.87:5555
 basePath: /api/test
 schemes:
-  - http
+- http
 
 tags:
-  - name: test
-    description: POST DATA
+- name: test
+  description: POST DATA
 
 paths:
-  /post/:
-    post:
-      tags:
-        - test
-      summary: API for post data
-      description: Check and save data
-      consumes:
-        - application/json
-      produces:
-        - application/json
-      parameters:
-        - name: POSTdata
-          in: body
-          description: An Operation
-          schema:
-            required:
-              - userID
-              - appName
-              - List
-            properties:
-              userID:
-                type: integer
-              appName:
-                type: string
-              dataList:
-                type: array
-                items:
-                  required:
-                    - dataList
-                  properties:
-                    dataList:
-                      type: array
-                      items:
-                        required:
-                          - x
-                          - y
-                          - statu
-                          - time
-                        properties:
-                          x:
-                            type: integer
-                          y:
-                            type: integer
-                          statu:
-                            type: integer
-                          time:
-                            type: string
-      response:
-        200:
-          description: OK
-          schema:
-            required:
-              - operationIDList
-            property:
-              operationIDList:
-                 type: array
-                 item:
-                   required:
-                     - ID
-                    properties:
-                      ID:
-                        type: integer
+/post/:
+  post:
+    tags:
+      - test
+    summary: API for post data
+    description: Check and save data
+    consumes:
+      - application/json
+    produces:
+      - application/json
+    parameters:
+      - name: POSTdata
+        in: body
+        description: An Operation
+        schema:
+          required:
+            - userID
+            - appName
+            - List
+          properties:
+            userID:
+              type: integer
+            appName:
+              type: string
+            List:
+              type: array
+              items:
+                required:
+                  - dataList
+                properties:
+                  dataList:
+                    type: array
+                    items:
+                      required:
+                        - x
+                        - y
+                        - statu
+                        - time
+                      properties:
+                        x:
+                          type: integer
+                        y:
+                          type: integer
+                        statu:
+                          type: integer
+                        time:
+                          type: string
+    responses:
+      200:
+        description: OK
+        schema:
+          required:
+            - operationIDList
+          properties:
+            operationIDList:
+               type: array
+               items:
+                 required:
+                   - ID
+                 properties:
+                    ID:
+                      type: integer
