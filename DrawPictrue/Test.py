@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import cv2
 import math
+import time
 
 # arr = np.random.rand(16, 16)
 # plt.imshow(arr, interpolation='nearset', cmap='bone', origin='lower')
@@ -13,20 +14,37 @@ import math
 # plt.show()
 
 data = (
-    ((1, 1), 1.0),
-    ((389, 500), 3.0),
-    ((700, 207), 4.0),
-    ((665, 544), 4.1),
-    ((1023, 1023), 4.7)
+    ((1, 1), 3.0),
+    ((389, 500), 3.1),
+    ((700, 207), 3.2),
+    ((665, 544), 3.3),
+    ((1023, 1023), 3.4),
+    ((500, 500), 3.5),
+    ((1500, 200), 3.6),
+    ((1400, 250), 3.7),
+    ((1350, 50), 3.8),
+    ((1350, 1000), 3.9),
+    ((600, 1000), 4.0),
+    ((100, 1000), 4.1),
+    ((1, 1000), 4.2)
 )
 default = 16581375
-factor = 10.0
-img = np.zeros((1080, 1920, 3), np.uint8)
+factor = 30.0
+k = 0.0001
+img = np.zeros((1920, 1080, 3), np.uint8)
+
 
 def drawImage(img, data):
-    averange = getAverLength(getLength(data))  # int
+    colorNow = 0.0
+    averange = int(getLength(data)/1.414)  # int
+    if averange == 0:
+        averange = default
     colorStep = default/averange  # float
-    for index in range(data):
+    color = int(colorNow)
+    for index in range(len(data)):
+#        cv2.imwrite("/home/song-ruyang/SpyEye/test.jpg", img)
+#        time.sleep(2)
+        img[data[index][0][0], data[index][0][1]] = [color / 65025, int(color / 255) % 256, color % 256]
         if index == 0 or index == len(data)-1:
             a = 0
         else:
@@ -36,22 +54,67 @@ def drawImage(img, data):
             v2 = math.sqrt(
                 pow((data[index + 1][0][0] - data[index][0][0]), 2) +
                 pow((data[index + 1][0][1] - data[index][0][1]), 2)) / (data[index+1][1] - data[index][1])
-            a = 2 * abs(v2 - v1) / (data[index + 1] - data[index - 1])
-#        color = int(colorStep * index)
-#        img[data[index][0][0], data[index][0][1]] = [color/65025, int(color/255) % 256, color % 256]
-#        drawSlash(img, data[index][0][0], data[index][0][1], a, )
+            a = 2 * abs(v2 - v1) / (data[index + 1][1] - data[index - 1][1])
+        print("[Point]", index, "| a=", a)
+        # a is right, but to large
+        if index != len(data)-1:
+            no = data[index]             # 当前节点
+            ne = data[index+1]           # 下一个节点
+            ddx = ne[0][0] - no[0][0]    # 横坐标之差（有符号）
+            ddy = ne[0][1] - no[0][1]    # 纵坐标之差（有符号）
+            dx = abs(ddx)                # 横坐标之差（无符号）
+            dy = abs(ddy)                # 纵坐标之差（无符号）
+            if ddx == 0:
+                v = 1.41
+            else:
+                v = ddy * 1.0 / (ddx * 1.0)  # 斜率（浮点数）
+            if (dy < dx or dx == 0) and dy != 0:                  # 斜率绝对值小于１时，遍历纵坐标之差
+                for i in range(int(dy) + 1):  # ｉ遍历整形纵坐标之差的所有单位
+                    i = int(ddy/dy) * i       # ｉ乘相应的符号
+                    colorNow += colorStep     # 当前小节点的颜色发生变化，浮点数为了保存细节
+                    color = int(colorNow)     # 整形color为了上色
+                    d = int(i * ddx / ddy)    # delta 为相对应的变化量，此处为横坐标随纵坐标偏移量
+                    # 当前节点坐标偏移后上色（小节点上色）
+                    img[no[0][0] + d, no[0][1] + i] = [color / 65025, int(color / 255) % 256, color % 256]
+                    # 与当前斜率垂直渲染
+                    drawSlash(img, no[0][0]+d, no[0][1]+i, a, v, color)
+            else:
+                for i in range(int(dx) + 1):
+                    i = int(ddx/dx) * i
+                    colorNow += colorStep
+                    color = int(colorNow)
+                    d = int(i * ddy / ddx)
+                    img[no[0][0] + i, no[0][1] + d] = [color / 65025, int(color / 255) % 256, color % 256]
+                    drawSlash(img, no[0][0]+i, no[0][1]+d, a, v, color)
+
 
 def drawSlash(img, x, y, a, v, color):
-    rev = (-1.0)/v
-    r = factor/a
+    if v == 0:
+        rev = 1.41
+    else:
+        rev = (-1.0)/v
+    a = a * k
+    if a == 0:
+        a = 5
+    r = factor / a
+#    print ("[r]: ", r)
     dy = abs(r*rev/(math.sqrt(1+rev*rev)))
     dx = abs(r/(math.sqrt(1+rev*rev)))
-#    if dy < dx:
-#        dx, dy = dy, dx
-    for i in range(int(dx)+1):
-        d = int(abs(rev)*i)
-        img[x-dx, y-d] = [color/65025, int(color/255) % 256, color % 256]
-        img[x+dx, y+d] = [color/65025, int(color/255) % 256, color % 256]
+#    print ("[dy]:", dy, "[dx]:", dx)
+    if dy < dx:
+        for i in range(int(dy)+1):
+            d = int(rev*i)
+            if (0 < x-d < 1920) and (0 < y-i < 1080):
+                img[x-d, y-i] = [color/65025, int(color/255) % 256, color % 256]
+            if (0 < x+d < 1920) and (0 < y+i < 1080):
+                img[x+d, y+i] = [color/65025, int(color/255) % 256, color % 256]
+    else:
+        for i in range(int(dx)+1):
+            d = int((rev)*i)
+            if (0 < x-i < 1920) and (0 < y-d < 1080):
+                img[x-i, y-d] = [color/65025, int(color/255) % 256, color % 256]
+            if (0 < x+i < 1920) and (0 < y+d < 1080):
+                img[x+i, y+d] = [color/65025, int(color/255) % 256, color % 256]
 
 
 def getAverLength(length):
