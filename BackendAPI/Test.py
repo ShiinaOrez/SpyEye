@@ -15,12 +15,12 @@ from spy_eye_app.models import Coor
 # plt.yticks(())
 # plt.show()
 
-coors = db.session.query(Coor).filter_by(846).all()
+coors = db.session().query(Coor).filter_by(oper_id=846).all()
 data = [((coor.x, coor.y), float(coor.time)) for coor in coors]
 default = 16581375
 factor = 30.0
 k = 0.0001
-img = np.zeros((1920, 1080, 3), np.uint8)
+img = np.zeros((1080, 1920, 3), np.uint8)
 
 
 def drawImage(img, data):
@@ -30,9 +30,11 @@ def drawImage(img, data):
         averange = default
     colorStep = default/averange  # float
     color = int(colorNow)
+    print(data)
     for index in range(len(data)):
 #        cv2.imwrite("/home/song-ruyang/SpyEye/test.jpg", img)
 #        time.sleep(2)
+        print(index)
         img[data[index][0][0], data[index][0][1]] = [color / 65025, int(color / 255) % 256, color % 256]
         if index == 0 or index == len(data)-1:
             a = 0
@@ -120,6 +122,9 @@ def getLength(origin):
         l = int(math.sqrt(l))
     return l
 
-drawImage(img, data)
+def run():
+    drawImage(img, data)
 
-cv2.imwrite("/home/song-ruyang/SpyEye/test.jpg", img)
+    cv2.imwrite("/home/song-ruyang/SpyEye/test.jpg", img)
+
+run()

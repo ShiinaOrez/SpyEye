@@ -3,7 +3,6 @@
 *.iml
 *.idea/
 *migrations/
-*.sqlite
 *.py.save
 __pycache__/
 migrations/
