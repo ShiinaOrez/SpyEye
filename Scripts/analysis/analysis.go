@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	fmt.Println("[Running...]")
+	fmt.Println("[INFO]: Start Running...")
 
 	file, err := os.Open("out.txt")
 	if err != nil {
@@ -44,12 +44,11 @@ func main() {
 	}
 
 	wg.Wait()
-	fmt.Println("[Analysing...]", counter)
 
 // Now obey the MIT TypeB protocol...
 
 	collection := Collection{
-		Slots: make([]Slot, 5),
+		Slots: make([]Slot, 10),
 	}
 	slotNow := 0
 	collection.Slots[0] = Slot {
@@ -57,9 +56,13 @@ func main() {
 		Used: true,
 	}
 	var trackNow Track
-	posNow := make([]Position, 5)
-	widthNow := make([]int64, 5)
+	posNow := make([]Position, 10)
+	widthNow := make([]int64, 10)
+	
 	trackCounter := 0
+	pointCounter := 0
+	maxSlot := 0
+	
 	for i:=1; i<=counter; i++ {
 		eventNow := store.Map[i]
 
@@ -121,10 +124,24 @@ func main() {
         			},
         			Width: widthNow[slotNow],
         		})
+        		pointCounter += 1
         		// fmt.Println("New Position:", posNow[slotNow])
         	}
         }
 	}
-	fmt.Printf("[Over...]: Have %d tracks.\n", trackCounter)
+
+	for collection.Slots[maxSlot].Used {
+		maxSlot += 1
+	}
+
+	fmt.Println("+------------------+--------------------+")
+	fmt.Printf("| 总解析日志行数   | %10d         |\n", counter)
+	fmt.Println("+------------------+--------------------+")
+	fmt.Printf("| 总捕捉触摸点数   | %10d         |\n", pointCounter)
+	fmt.Println("+------------------+--------------------+")
+	fmt.Printf("| 总触摸轨迹数量   | %10d         |\n", trackCounter)
+	fmt.Println("+------------------+--------------------+")
+	fmt.Printf("| 最大多点触摸数   | %10d         |\n", maxSlot)
+	fmt.Println("+------------------+--------------------+")
 	return
 }
