@@ -137,6 +137,8 @@ func main() {
 	fmt.Println("+------------------+--------------------+")
 	fmt.Printf("| 总解析日志行数   | %10d         |\n", counter)
 	fmt.Println("+------------------+--------------------+")
+	fmt.Printf("| 总触摸经历时间   | %10d         |\n", int(store.Map[counter].Time-store.Map[1].Time)/1000)
+	fmt.Println("+------------------+--------------------+")
 	fmt.Printf("| 总捕捉触摸点数   | %10d         |\n", pointCounter)
 	fmt.Println("+------------------+--------------------+")
 	fmt.Printf("| 总触摸轨迹数量   | %10d         |\n", trackCounter)
