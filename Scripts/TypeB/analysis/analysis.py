@@ -1,5 +1,5 @@
 import os
-import numpy
+import numpy as np
 
 class Position:
     X = 0
@@ -18,6 +18,7 @@ class Report:
         self.IsBtn = is_btn
 
 class Track:
+    StartTime = 0
     ID = 0
     Reports = []
     def __init__(self, id, reports):
@@ -78,6 +79,7 @@ def main(file_name):
             counter += 1
         line = f.readline()
     f.close()
+    tracks = []
     collection = Collection()
     slot_now = 0
     collection.Slots.append(Slot([], True))
@@ -96,9 +98,14 @@ def main(file_name):
                 if event_now.Value == -1:
                     if i < counter-1 and store[i+1].Statu == "EV_KEY":
                         track_now.Reports.append(Report(store[i+1].Time, True))
-                        collection.Slots[slot_now].Tracks.append(track_now)
+                        if track_now.StartTime == 0 and len(track_now.Reports) == 1:
+                            track_now.StartTime = track_now.Reports[0].Time
+                        track_now.Reports[-1].Time -= track_now.StartTime
+                        
+                        tracks.append(track_now)
                         track_now = Track(0, [])
-                    collection.Slots[slot_now].Tracks.append(track_now)
+
+                    tracks.append(track_now)
                     pos_now[slot_now] = Position(0, 0)
                     width_now[slot_now] = 0
                     track_counter += 1
@@ -121,11 +128,28 @@ def main(file_name):
                 new_report.Pos = Position(pos_now[slot_now].X, pos_now[slot_now].Y)
                 new_report.Width = width_now[slot_now]
                 track_now.Reports.append(new_report)
+                if track_now.StartTime == 0 and len(track_now.Reports) == 1:
+                    track_now.StartTime = track_now.Reports[0].Time
+                track_now.Reports[-1].Time -= track_now.StartTime
                 point_counter += 1
-    while collection.Slots[max_slot].Used:
-        max_slot += 1
+    return tracks
 
-    print(counter, int(store[counter-1].Time-store[0].Time)/1000, point_counter, track_counter, max_slot)
+d_position = np.dtype([('x', np.int16), ('y', np.int16)])
+d_report = np.dtype([('time', np.float16), ('is_btn', 'b'), ('pos', d_position), ('width', np.int16)])
+
+def save_as_np(tracks, name):
+    np_tracks_list = []
+    for track in tracks:
+        np_reports_list = [(report.Time, report.IsBtn, (report.Pos.X, report.Pos.Y,), report.Width,) for report in track.Reports]
+        np_tracks_list.append(np.array(np_reports_list, dtype=d_report))
+    np_tracks = np.array(np_tracks_list)
+    np.save(name, np_tracks)
 
 if __name__ == "__main__":
-    main("out.txt")
+    fixs = ["alipay", "kfc", "zhihu", "chrome", "qq"]
+    names = ["dlj-"+fix for fix in fixs]
+    for name in names:
+        try:
+            save_as_np(main(name+".txt"), name)
+        except Exception as e:
+            pass
