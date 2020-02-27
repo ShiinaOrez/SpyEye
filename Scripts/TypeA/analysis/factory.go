@@ -1,8 +1,8 @@
 package main
 
 import (
-    "strings"
-    "strconv"
+	"strconv"
+	"strings"
 )
 
 func Factory(text string) Event {
@@ -10,13 +10,13 @@ func Factory(text string) Event {
 	pieces := strings.Split(text, " ")
 	for _, piece := range pieces {
 		if piece != "" {
-			segs = append(segs, piece)	
+			segs = append(segs, piece)
 		}
 	}
 
-	newEvent := Event {
+	newEvent := Event{
 		Statu: segs[3],
-		Info: segs[4],
+		Info:  segs[4],
 	}
 	if segs[5] == "DOWN" {
 		newEvent.Value = -333 // Down
