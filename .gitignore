@@ -9,3 +9,4 @@ migrations/
 *.txt
 *.npy
 *-npy/
+main
